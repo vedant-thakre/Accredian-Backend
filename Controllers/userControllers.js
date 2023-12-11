@@ -20,7 +20,6 @@ export const registerUser = (req, res, next) => {
   const checkEmailSql = "SELECT * FROM login WHERE email = ?";
   const chekcUsernameSql = "SELECT * FROM login WHERE username = ?";
 
-  // Check if the username already exists
   DB.query(chekcUsernameSql, [username], (err, usernameResults) => {
     if (err) {
       console.error(err);
@@ -31,7 +30,6 @@ export const registerUser = (req, res, next) => {
       return ErrorHandler("Username already exists", 400, res);
     }
 
-    // Check if the email already exists
     DB.query(checkEmailSql, [email], (err, emailResults) => {
       if (err) {
         console.error(err);
@@ -41,7 +39,6 @@ export const registerUser = (req, res, next) => {
       if (emailResults.length > 0) {
         return ErrorHandler("Email already exists", 400, res);
       } else {
-        // Proceed with user registration
         if (req.files && req.files.image) {
           cloudinary.uploader.upload(
             req.files.image.tempFilePath,
@@ -99,18 +96,15 @@ const saveUserToDatabase = (username, email, password, imageurl, res) => {
 export const loginUser = (req, res, next) => {
   const { emailOrUsername, password } = req.body;
 
-  // Check if the input is an email
   const isEmail = emailOrUsername.includes("@");
 
   let sql;
   let parameter;
 
   if (isEmail) {
-    // If it's an email, use email for the query
     sql = "SELECT * FROM login WHERE email = ?";
     parameter = emailOrUsername;
   } else {
-    // If it's a username, use username for the query
     sql = "SELECT * FROM login WHERE username = ?";
     parameter = emailOrUsername;
   }
